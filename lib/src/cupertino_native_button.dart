@@ -29,6 +29,7 @@ class CupertinoNativeButton extends StatefulWidget {
     required this.onPressed,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.borderShape = CupertinoNativeButtonBorderShape.automatic,
     this.expand = false,
     this.role,
@@ -44,6 +45,7 @@ class CupertinoNativeButton extends StatefulWidget {
     required this.onPressed,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.borderShape = CupertinoNativeButtonBorderShape.automatic,
     this.expand = false,
     this.role,
@@ -59,6 +61,7 @@ class CupertinoNativeButton extends StatefulWidget {
     required this.onPressed,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.borderShape = CupertinoNativeButtonBorderShape.automatic,
     this.expand = false,
     this.role,
@@ -75,6 +78,7 @@ class CupertinoNativeButton extends StatefulWidget {
     required this.onPressed,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.borderShape = CupertinoNativeButtonBorderShape.automatic,
     this.expand = false,
     this.role,
@@ -91,6 +95,7 @@ class CupertinoNativeButton extends StatefulWidget {
     required this.onPressed,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.borderShape = CupertinoNativeButtonBorderShape.automatic,
     this.expand = false,
     this.role,
@@ -111,6 +116,7 @@ class CupertinoNativeButton extends StatefulWidget {
     this.style = CupertinoNativeButtonStyle.glass,
     this.sizeStyle = CupertinoNativeControlSize.regular,
     this.color,
+    this.brightness,
     this.role,
     this.visibilityPriority =
         CupertinoNativeToolbarVisibilityPriority.automatic,
@@ -131,6 +137,12 @@ class CupertinoNativeButton extends StatefulWidget {
 
   /// Tint of the button.
   final Color? color;
+
+  /// The button's own appearance, when it differs from the app's theme:
+  /// dark glass on a dark surface in a light app, say. Never reaches the
+  /// window, so the rest of the app keeps the theme's. Null follows the
+  /// content under the bar in a navigation bar, and the theme elsewhere.
+  final Brightness? brightness;
   final CupertinoNativeButtonBorderShape borderShape;
 
   /// Fill the width offered.
@@ -228,10 +240,14 @@ class _CupertinoNativeButtonState extends State<CupertinoNativeButton>
 
   // Follows the app's own theme brightness, not the device's: a light app
   // forced on a dark-mode phone should still get a light control.
-  /// In a bar, the content under it; elsewhere the app's theme.
+  /// [CupertinoNativeButton.brightness], or in a bar the content under it;
+  /// elsewhere the app's theme.
   bool get _isDark =>
-      (BarSlot.brightnessOf(context) ?? Theme.of(context).brightness) ==
-      Brightness.dark;
+      (_appearance ?? Theme.of(context).brightness) == Brightness.dark;
+
+  /// The button's own appearance, if it has one apart from the app's.
+  Brightness? get _appearance =>
+      widget.brightness ?? BarSlot.brightnessOf(context);
 
   @override
   void didChangeDependencies() {
@@ -256,6 +272,7 @@ class _CupertinoNativeButtonState extends State<CupertinoNativeButton>
         oldWidget.borderShape != widget.borderShape ||
         oldWidget.expand != widget.expand ||
         oldWidget.color != widget.color ||
+        oldWidget.brightness != widget.brightness ||
         oldWidget.width != widget.width ||
         oldWidget.height != widget.height) {
       updateNativeView('updateButton', _toMap());
@@ -301,7 +318,7 @@ class _CupertinoNativeButtonState extends State<CupertinoNativeButton>
       'textColor': nativeArgb(label.textStyle?.color, isDark: _isDark),
       // The app's, for the window; a bar's content only for this view.
       'isDark': Theme.of(context).brightness == Brightness.dark,
-      'appearanceDark': switch (BarSlot.brightnessOf(context)) {
+      'appearanceDark': switch (_appearance) {
         null => null,
         final b => b == Brightness.dark,
       },

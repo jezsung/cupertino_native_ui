@@ -113,6 +113,7 @@ default (`style:` to change it).
 | `child`            | `Widget`                           | The label: a `Text`, `CupertinoSymbolImage`, `Icon`, `ImageIcon` of an asset, or a `Row` of an icon and a `Text`. |
 | `onPressed`        | `VoidCallback?`                    | Called on tap. Null disables the button.                                                                          |
 | `color`            | `Color?`                           | Tint colour of the button.                                                                                        |
+| `brightness`       | `Brightness?`                      | The button's own appearance, e.g. dark glass on a dark surface in a light app. Never reaches the window. Null follows the theme, or in a navigation bar the content under it. |
 | `sizeStyle`        | `CupertinoNativeControlSize`       | `mini`, `small`, `regular`, `large`, `extraLarge`. Default `regular`.                                             |
 | `borderShape`      | `CupertinoNativeButtonBorderShape` | `automatic`, `capsule`, `circle`, `roundedRectangle`. Default `automatic`.                                        |
 | `expand`           | `bool`                             | Fill the available width. Default `false`.                                                                        |

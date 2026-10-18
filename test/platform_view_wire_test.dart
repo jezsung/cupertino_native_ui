@@ -517,6 +517,23 @@ void main() {
     expect(params['isDark'], false);
   }, variant: iOS);
 
+  testWidgets('a button takes its own brightness over the theme', (
+    tester,
+  ) async {
+    // A light app, with a button on a dark surface: its glass goes dark.
+    final params = await paramsOf(
+      tester,
+      CupertinoNativeButton.icon(
+        CupertinoSymbols.gearshape,
+        brightness: Brightness.dark,
+        onPressed: () {},
+      ),
+    );
+    // Its own appearance only: the window keeps the app's.
+    expect(params['appearanceDark'], true);
+    expect(params['isDark'], false);
+  }, variant: iOS);
+
   // `.hard` is native too, so its blur reaches native views as it does
   // Flutter content: one even blur under the page colour at 91%.
   testWidgets('scroll edge effect hard is an even blur under a flat wash', (
