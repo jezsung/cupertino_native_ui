@@ -75,6 +75,27 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         result(nil)
     }
 
+    /// The native body's laid-out height, for the `fitted` detent: nil until
+    /// the body is first laid out.
+    private var contentHeight: CGFloat?
+
+    /// The body was laid out at `height`: a fitted sheet rests there.
+    private func contentHeightChanged(_ height: CGFloat) {
+        let height = ceil(height)
+        guard height != contentHeight else { return }
+        let first = contentHeight == nil
+        contentHeight = height
+        guard #available(iOS 16.0, *), let sheet = controller?.sheetPresentationController else {
+            return
+        }
+        // The first height lands as the sheet rises: no animation of its own.
+        if first {
+            sheet.invalidateDetents()
+        } else {
+            sheet.animateChanges { sheet.invalidateDetents() }
+        }
+    }
+
     func show(args: [String: Any], result: @escaping FlutterResult) {
         guard controller == nil else {
             result(
@@ -112,6 +133,7 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         // A native body IS the content: no engine, no isolate.
         let engine: FlutterEngine? = nativeBody == nil ? makeEngine(route: route, isDark: isDark) : nil
         bodyModel = nil
+        contentHeight = nil
         if let nativeBody {
             let model = NativeBodyModel()
             model.root = nativeBody
@@ -128,11 +150,15 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         let showLoadingIndicator = args["showLoadingIndicator"] as? Bool ?? false
         let backgroundArgb = args["backgroundColor"] as? Int
 
+        let fitted = (args["detents"] as? [String])?.contains("fitted") == true
         let content: AnyView
         if let model = bodyModel {
             content = AnyView(
-                NativeBodyPage(model: model, scrollEdgeEffect: scrollEdgeEffect) {
-                    [weak self] id, value in
+                NativeBodyPage(
+                    model: model, scrollEdgeEffect: scrollEdgeEffect,
+                    onContentHeight: fitted
+                        ? { [weak self] in self?.contentHeightChanged($0) } : nil
+                ) { [weak self] id, value in
                     self?.eventsChannel?.invokeMethod(
                         "bodyEvent", arguments: ["id": id, "value": value])
                 })
@@ -214,6 +240,20 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
             for name in (args["detents"] as? [String]) ?? [] {
                 switch name {
                 case "medium": detents.append(.medium())
+                case "fitted":
+                    // The body's own height; medium where it can't be
+                    // measured (before iOS 16, or a route's Flutter body).
+                    if #available(iOS 16.0, *), bodyModel != nil {
+                        detents.append(
+                            .custom(identifier: .init("fitted")) { [weak self] context in
+                                // Medium until the body is laid out.
+                                min(
+                                    self?.contentHeight ?? context.maximumDetentValue / 2,
+                                    context.maximumDetentValue)
+                            })
+                    } else {
+                        detents.append(.medium())
+                    }
                 default: detents.append(.large())
                 }
             }

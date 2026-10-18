@@ -1200,7 +1200,7 @@ await CupertinoNativeSheet.show(
 | `nativeBody` / `onBodyEvent`            | `CupertinoNativeBody?` / `void Function(String, Object?)?` | SwiftUI content with no engine, and the call reporting its changes; see below. |
 | `navigationBar`                         | `CupertinoNativeScaffoldNavigationBar?`                    | Title and buttons pinned at the top of the sheet.                              |
 | `bottom`                                | `CupertinoNativeSheetSegmentedControl?`                    | A segmented control pinned under the bar.                                      |
-| `detents`                               | `List<CupertinoNativeSheetDetent>`                         | Heights the sheet rests at: `medium` (half), `large`. Default `[large]`.       |
+| `detents`                               | `List<CupertinoNativeSheetDetent>`                         | Heights the sheet rests at: `medium` (half), `large`, `fitted` (a native body's own height, _iOS 16+_). Default `[large]`. |
 | `showDragHandle`                        | `bool`                                                     | Show the grabber. Default `false`.                                             |
 | `detentHeights`                         | `List<double>`                                             | Extra stops at fixed heights, in points. _iOS 16+_                             |
 | `undimmedUpTo`                          | `CupertinoNativeSheetDetent?`                              | Content behind stays undimmed and usable up to this detent (the Maps sheet).   |

@@ -792,6 +792,21 @@ void main() {
       expect(args!['undimmedUpTo'], 'medium');
       expect(args!['dismissible'], isFalse);
     }, variant: iOS);
+
+    testWidgets('a fitted sheet sends its detent by name', (tester) async {
+      Map? args;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(alert, (
+        call,
+      ) async {
+        args = call.arguments as Map;
+        return null;
+      });
+      await CupertinoNativeSheet.show(
+        nativeBody: CupertinoNativeBody.text('Hi'),
+        detents: const [CupertinoNativeSheetDetent.fitted],
+      );
+      expect(args!['detents'], ['fitted']);
+    }, variant: iOS);
   });
 
   group('buttons and symbols', () {

@@ -14,7 +14,13 @@ import 'internal/native_color.dart';
 
 /// The heights a [CupertinoNativeSheet] can rest at, mirroring
 /// `UISheetPresentationController.Detent`.
-enum CupertinoNativeSheetDetent { medium, large }
+///
+/// [fitted] is the height of a native body's content as laid out, up to
+/// the full height, following it as the body updates: SwiftUI's
+/// `PresentationSizing.fitted`, for a sheet's detent. Its content doesn't
+/// scroll, or bounce, until it outgrows the full height (iOS 16.4+).
+/// Below iOS 16, and for a route's Flutter body, it's [medium].
+enum CupertinoNativeSheetDetent { medium, large, fitted }
 
 /// A native segmented control pinned under the sheet's navigation bar:
 /// the `bottom` slot of [CupertinoNativeSheet.show].

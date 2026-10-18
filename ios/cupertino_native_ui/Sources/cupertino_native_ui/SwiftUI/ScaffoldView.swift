@@ -212,6 +212,17 @@ extension View {
         }
     }
 
+    /// A page that fits its content doesn't scroll, or bounce, until the
+    /// content outgrows it: a fitted sheet capped at the full height.
+    @ViewBuilder
+    func applyFittedScroll(_ fitted: Bool) -> some View {
+        if fitted, #available(iOS 16.4, *) {
+            self.scrollBounceBehavior(.basedOnSize)
+        } else {
+            self
+        }
+    }
+
     @ViewBuilder
     func applyScrollDismiss(_ body: BodyNodeConfig?) -> some View {
         if #available(iOS 16.0, *) {
@@ -327,7 +338,23 @@ struct TabBottomAccessoryView: View {
 struct NativeBodyPage: View {
     @ObservedObject var model: NativeBodyModel
     let scrollEdgeEffect: String?
+    /// The tree's height as laid out in the scroll view, whenever it
+    /// changes: what a fitted sheet rests at. A page given it fits its
+    /// content, so it scrolls only once the content outgrows it.
+    let onContentHeight: ((CGFloat) -> Void)?
     let onEvent: (String, Any?) -> Void
+
+    init(
+        model: NativeBodyModel,
+        scrollEdgeEffect: String?,
+        onContentHeight: ((CGFloat) -> Void)? = nil,
+        onEvent: @escaping (String, Any?) -> Void
+    ) {
+        self.model = model
+        self.scrollEdgeEffect = scrollEdgeEffect
+        self.onContentHeight = onContentHeight
+        self.onEvent = onEvent
+    }
 
     var body: some View {
         if model.root?.type == "photosPicker" {
@@ -343,8 +370,18 @@ struct NativeBodyPage: View {
         ScrollView {
             NativeBodyView(model: model, onEvent: onEvent)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    if let onContentHeight {
+                        GeometryReader { geometry in
+                            Color.clear
+                                .onAppear { onContentHeight(geometry.size.height) }
+                                .onChange(of: geometry.size.height) { onContentHeight($0) }
+                        }
+                    }
+                }
         }
         .applyScrollEdgeEffect(scrollEdgeEffect)
+        .applyFittedScroll(onContentHeight != nil)
         // The body's own choice wins: this outer scroll is the one the
         // user actually drags, so a `.never` hard-written here silently
         // overrode `CupertinoNativeBody.scroll(dismissKeyboard:)`.
