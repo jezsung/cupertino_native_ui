@@ -33,6 +33,8 @@ abstract final class CupertinoNativePopover {
   /// [anchor] is in global (window) coordinates, see [anchorOf].
   /// [preferredSize] sizes the card; without one UIKit sizes it to the
   /// content, which for a Flutter body means the screen.
+  /// [brightness] pins its appearance; when null it follows the platform
+  /// brightness.
   static Future<void> show({
     required String route,
     required Rect anchor,
@@ -40,7 +42,7 @@ abstract final class CupertinoNativePopover {
     CupertinoNativeScaffoldNavigationBar? navigationBar,
     Color? backgroundColor,
     bool? showLoadingIndicator,
-    bool? isDark,
+    Brightness? brightness,
     void Function(String actionId)? onToolbarAction,
     ValueChanged<String>? onSearchChanged,
     ValueChanged<String>? onSearchSubmitted,
@@ -52,7 +54,7 @@ abstract final class CupertinoNativePopover {
       navigationBar: navigationBar,
       backgroundColor: backgroundColor,
       showLoadingIndicator: showLoadingIndicator,
-      isDark: isDark,
+      brightness: brightness,
       onToolbarAction: onToolbarAction,
       onSearchChanged: onSearchChanged,
       onSearchSubmitted: onSearchSubmitted,

@@ -99,8 +99,8 @@ abstract final class CupertinoNativeSheet {
   /// bar, reporting through [onBottomChanged]. Bar item taps report their
   /// `actionId` through [onToolbarAction].
   ///
-  /// [isDark] pins the sheet's appearance; when null it follows the platform
-  /// brightness.
+  /// [brightness] pins the sheet's appearance, its Liquid Glass background
+  /// included; when null it follows the platform brightness.
   ///
   /// [detentHeights] adds stops at fixed heights in points, next to
   /// [detents] (`.custom`, iOS 16+). [undimmedUpTo] leaves the content behind
@@ -138,7 +138,7 @@ abstract final class CupertinoNativeSheet {
         CupertinoScrollEdgeEffectStyle.soft,
     Color? backgroundColor,
     bool? showLoadingIndicator,
-    bool? isDark,
+    Brightness? brightness,
     void Function(String actionId)? onToolbarAction,
     ValueChanged<int>? onBottomChanged,
     ValueChanged<String>? onSearchChanged,
@@ -160,8 +160,8 @@ abstract final class CupertinoNativeSheet {
     _ensureEventsHandler();
 
     final dark =
-        isDark ??
-        ui.PlatformDispatcher.instance.platformBrightness == ui.Brightness.dark;
+        (brightness ?? ui.PlatformDispatcher.instance.platformBrightness) ==
+        Brightness.dark;
     _dark = dark;
     final body = _sentBody = nativeBody?.toMap(isDark: dark);
     _sentBodyJson = body == null ? null : jsonEncode(body);

@@ -75,7 +75,7 @@ class _SheetDemoPageState extends State<SheetDemoPage> {
     setState(() => _last = '$label: presented');
     await CupertinoNativeSheet.show(
       route: 'newEvent',
-      isDark: CupertinoTheme.brightnessOf(context) == Brightness.dark,
+      brightness: CupertinoTheme.brightnessOf(context),
       navigationBar: navigationBar,
       bottom: bottom,
       detents: detents,

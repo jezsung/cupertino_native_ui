@@ -793,6 +793,24 @@ void main() {
       expect(args!['dismissible'], isFalse);
     }, variant: iOS);
 
+    testWidgets('a sheet sends its brightness as isDark', (tester) async {
+      Map? args;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(alert, (
+        call,
+      ) async {
+        args = call.arguments as Map;
+        return null;
+      });
+      await CupertinoNativeSheet.show(route: 'r', brightness: Brightness.dark);
+      expect(args!['isDark'], isTrue);
+      await CupertinoNativePopover.show(
+        route: 'r',
+        anchor: Rect.zero,
+        brightness: Brightness.light,
+      );
+      expect(args!['isDark'], isFalse);
+    }, variant: iOS);
+
     testWidgets('a fitted sheet sends its detent by name', (tester) async {
       Map? args;
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(alert, (
