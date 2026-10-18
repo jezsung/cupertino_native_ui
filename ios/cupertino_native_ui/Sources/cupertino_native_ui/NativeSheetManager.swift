@@ -206,6 +206,11 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         // band in the bar / safe-area regions the body doesn't paint.
         if let bg = args["backgroundColor"] as? Int {
             presented.view.backgroundColor = UIColor(argb: bg)
+        } else if #available(iOS 26.0, *) {
+            // The system's own background: Liquid Glass below the large
+            // detent, opaque at it, as a SwiftUI sheet has. Before iOS 26 a
+            // sheet has none of its own, so the default stays.
+            presented.view.backgroundColor = .clear
         }
         // A popover is the same engine and the same chrome, presented
         // pointing at a control instead of rising from the bottom. On iPhone
