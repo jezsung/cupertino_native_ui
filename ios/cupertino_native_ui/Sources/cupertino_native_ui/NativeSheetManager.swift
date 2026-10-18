@@ -234,6 +234,7 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
             self.engine = engine
             self.controller = presented
             self.showResult = result
+            applyInterfaceStyle(to: presented, isDark: isDark)
             presenter.present(presented, animated: true)
             return
         }
@@ -287,6 +288,7 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         self.engine = engine
         self.controller = presented
         self.showResult = result
+        applyInterfaceStyle(to: presented, isDark: isDark)
         presenter.present(presented, animated: true)
     }
 
@@ -314,6 +316,21 @@ final class NativeSheetManager: NSObject, UIAdaptivePresentationControllerDelega
         for controller: UIPresentationController, traitCollection: UITraitCollection
     ) -> UIModalPresentationStyle {
         return .none
+    }
+
+    /// Pins the presentation's appearance, not just its content's: on iOS 26
+    /// the sheet's or popover's Liquid Glass background belongs to the
+    /// presentation, which otherwise follows the window. Called once the
+    /// presentation style is set, as that decides the presentation
+    /// controller.
+    private func applyInterfaceStyle(to presented: UIViewController, isDark: Bool) {
+        guard let presentation = presented.presentationController else { return }
+        let style: UIUserInterfaceStyle = isDark ? .dark : .light
+        if #available(iOS 17.0, *) {
+            presentation.traitOverrides.userInterfaceStyle = style
+        } else {
+            presentation.overrideTraitCollection = UITraitCollection(userInterfaceStyle: style)
+        }
     }
 
     private func finish() {
